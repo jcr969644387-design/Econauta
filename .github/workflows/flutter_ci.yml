@@ -40,4 +40,13 @@ jobs:
         run: flutter analyze
 
       - name: Ejecutar pruebas
-        run: flutter test
+        run: |
+          flutter test --reporter expanded 2>&1 | tee test-output.txt
+          status=${PIPESTATUS[0]}
+          {
+            echo '### Resultado de flutter test'
+            echo '```text'
+            tail -n 200 test-output.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
