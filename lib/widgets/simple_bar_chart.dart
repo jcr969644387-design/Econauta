@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'app_palette.dart';
+import 'app_theme.dart';
 
 /// Barra individual de un grafico simple.
 class ChartEntry {
@@ -44,6 +44,7 @@ class SimpleBarChart extends StatelessWidget {
       return const SizedBox.shrink();
     }
     final theme = Theme.of(context);
+    final colors = AppColors.of(context);
     var maxValue = 0.0;
     for (final entry in entries) {
       final magnitude = entry.value.abs();
@@ -62,9 +63,9 @@ class SimpleBarChart extends StatelessWidget {
           final barHeight = (barArea * ratio).clamp(4.0, barArea);
           final isNegative = entry.value < 0;
           final custom = entry.color;
-          var color = AppPalette.chartBar;
+          var color = colors.accent;
           if (isNegative) {
-            color = AppPalette.negative;
+            color = colors.negative;
           }
           if (custom != null) {
             color = custom;
@@ -82,14 +83,21 @@ class SimpleBarChart extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-                  Container(
-                    height: barHeight,
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(6),
-                      ),
-                    ),
+                  TweenAnimationBuilder<double>(
+                    duration: const Duration(milliseconds: 420),
+                    curve: Curves.easeOutCubic,
+                    tween: Tween<double>(begin: 0, end: barHeight),
+                    builder: (BuildContext context, double size, Widget? _) {
+                      return Container(
+                        height: size,
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(6),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 6),
                   Text(

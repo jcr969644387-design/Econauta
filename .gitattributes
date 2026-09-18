@@ -1,0 +1,3 @@
+# Los efectos de sonido son binarios: nunca deben normalizarse.
+*.wav binary
+*.png binary

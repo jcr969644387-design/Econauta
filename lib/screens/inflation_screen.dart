@@ -4,9 +4,9 @@ import '../calculators/inflation_calculator.dart';
 import '../models/economy_state.dart';
 import '../services/app_state.dart';
 import '../services/history_utils.dart';
-import '../widgets/app_palette.dart';
 import '../widgets/educational_notice.dart';
 import '../widgets/indicator_card.dart';
+import '../widgets/screen_scaffold.dart';
 import '../widgets/simple_bar_chart.dart';
 
 /// Modulo 1: inflacion actual, meta, variacion y explicacion sencilla.
@@ -20,44 +20,37 @@ class InflationScreen extends StatelessWidget {
       builder: (BuildContext context, Widget? child) {
         final state = appState.current;
         final previous = appState.previous;
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Inflacion'),
-            backgroundColor: AppPalette.primary,
-            foregroundColor: Colors.white,
-          ),
-          body: ListView(
-            padding: const EdgeInsets.all(16),
-            children: <Widget>[
-              SectionCard(
-                title: 'Situacion actual',
-                subtitle: InflationCalculator.classify(
-                  inflation: state.inflation,
-                  target: state.inflationTarget,
-                ),
-                child: _InflationIndicators(
-                  state: state,
-                  previous: previous,
-                ),
+        return ScreenScaffold(
+          title: 'Inflacion',
+          children: <Widget>[
+            SectionCard(
+              title: 'Situacion actual',
+              subtitle: InflationCalculator.classify(
+                inflation: state.inflation,
+                target: state.inflationTarget,
               ),
-              const SizedBox(height: 16),
-              SectionCard(
-                title: 'Evolucion de la inflacion',
-                subtitle: 'Ultimos periodos simulados',
-                child: SimpleBarChart(
-                  entries: _entries(appState.history),
-                  suffix: ' %',
-                ),
+              child: _InflationIndicators(
+                state: state,
+                previous: previous,
               ),
-              const SizedBox(height: 16),
-              SectionCard(
-                title: 'Explicacion educativa',
-                child: Text(_explanation(state)),
+            ),
+            const SizedBox(height: 16),
+            SectionCard(
+              title: 'Evolucion de la inflacion',
+              subtitle: 'Ultimos periodos simulados',
+              child: SimpleBarChart(
+                entries: _entries(appState.history),
+                suffix: ' %',
               ),
-              const SizedBox(height: 16),
-              const EducationalNotice(),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+            SectionCard(
+              title: 'Explicacion educativa',
+              child: Text(_explanation(state)),
+            ),
+            const SizedBox(height: 16),
+            const EducationalNotice(),
+          ],
         );
       },
     );

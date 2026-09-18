@@ -2,6 +2,26 @@
 
 Todas las versiones relevantes de Econauta se documentan en este archivo.
 
+## [1.0.2] - 2026-09-18
+
+### Agregado
+
+- Pantalla independiente de Configuracion con sonido, vibracion, tema e
+  informacion del proyecto, accesible desde el engranaje de la pantalla
+  principal.
+- Efectos de sonido cortos para pulsar, confirmar, completar, desbloquear un
+  logro y acertar o fallar una respuesta.
+- Vibracion nativa con cuatro intensidades: suave, exito, advertencia y error.
+- Tema oscuro y opcion de seguir el tema del sistema.
+- Persistencia de las preferencias mediante un repositorio dedicado.
+
+### Cambiado
+
+- Todas las pantallas usan un contenedor comun que respeta el notch, la
+  Dynamic Island, la barra de navegacion y la zona de gestos.
+- Transiciones entre pantallas mas suaves, con desvanecido y desplazamiento.
+- Microinteracciones en botones, tarjetas de indicadores y graficos.
+
 ## [1.0.0] - 2026-09-17
 
 ### Agregado

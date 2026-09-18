@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import '../calculators/fiscal_policy_calculator.dart';
 import '../models/policy_settings.dart';
 import '../services/app_state.dart';
-import '../widgets/app_palette.dart';
+import '../services/feedback_service.dart';
 import '../widgets/educational_notice.dart';
 import '../widgets/indicator_card.dart';
 import '../widgets/policy_slider.dart';
+import '../widgets/screen_scaffold.dart';
 
 /// Modulo 4: politica fiscal con impuestos y gasto publico.
 class FiscalPolicyScreen extends StatefulWidget {
@@ -36,6 +37,11 @@ class _FiscalPolicyScreenState extends State<FiscalPolicyScreen> {
 
   void _apply() {
     final applied = appState.updatePolicy(_draft);
+    if (applied) {
+      feedback.confirm();
+    } else {
+      feedback.warning();
+    }
     final message = applied
         ? 'Politica fiscal aplicada. Simula para ver los efectos.'
         : 'Valores fuera de rango. Revisa los controles.';
@@ -54,92 +60,81 @@ class _FiscalPolicyScreenState extends State<FiscalPolicyScreen> {
       gdpGrowth: state.gdpGrowth,
       publicDebt: state.publicDebt,
     );
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Politica fiscal'),
-        backgroundColor: AppPalette.primary,
-        foregroundColor: Colors.white,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: <Widget>[
-          SectionCard(
-            title: 'Instrumentos fiscales',
-            subtitle: FiscalPolicyCalculator.stance(draft),
-            child: Column(
-              children: <Widget>[
-                PolicySlider(
-                  label: 'Impuestos (% del PIB)',
-                  value: _taxRate,
-                  min: PolicySettings.minTaxRate,
-                  max: PolicySettings.maxTaxRate,
-                  helper: 'Nivel neutral de referencia: 18.0 %',
-                  onChanged: (double value) {
-                    setState(() {
-                      _taxRate = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 8),
-                PolicySlider(
-                  label: 'Gasto publico (% del PIB)',
-                  value: _spendingRate,
-                  min: PolicySettings.minSpendingRate,
-                  max: PolicySettings.maxSpendingRate,
-                  helper: 'Nivel neutral de referencia: 20.0 %',
-                  onChanged: (double value) {
-                    setState(() {
-                      _spendingRate = value;
-                    });
-                  },
-                ),
-              ],
-            ),
+    return ScreenScaffold(
+      title: 'Politica fiscal',
+      children: <Widget>[
+        SectionCard(
+          title: 'Instrumentos fiscales',
+          subtitle: FiscalPolicyCalculator.stance(draft),
+          child: Column(
+            children: <Widget>[
+              PolicySlider(
+                label: 'Impuestos (% del PIB)',
+                value: _taxRate,
+                min: PolicySettings.minTaxRate,
+                max: PolicySettings.maxTaxRate,
+                helper: 'Nivel neutral de referencia: 18.0 %',
+                onChanged: (double value) {
+                  setState(() {
+                    _taxRate = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 8),
+              PolicySlider(
+                label: 'Gasto publico (% del PIB)',
+                value: _spendingRate,
+                min: PolicySettings.minSpendingRate,
+                max: PolicySettings.maxSpendingRate,
+                helper: 'Nivel neutral de referencia: 20.0 %',
+                onChanged: (double value) {
+                  setState(() {
+                    _spendingRate = value;
+                  });
+                },
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-          SectionCard(
-            title: 'Efecto estimado',
-            subtitle: 'Calculo educativo antes de simular',
-            child: Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: IndicatorCard(
-                        label: 'Impulso fiscal',
-                        value: impulse.toStringAsFixed(2),
-                        detail: 'Puntos de demanda agregada',
-                      ),
+        ),
+        const SizedBox(height: 16),
+        SectionCard(
+          title: 'Efecto estimado',
+          subtitle: 'Calculo educativo antes de simular',
+          child: Column(
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: IndicatorCard(
+                      label: 'Impulso fiscal',
+                      value: impulse.toStringAsFixed(2),
+                      detail: 'Puntos de demanda agregada',
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: IndicatorCard(
-                        label: 'Deficit proyectado',
-                        value: '${deficit.toStringAsFixed(2)} %',
-                        detail: 'Porcentaje del PIB',
-                      ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: IndicatorCard(
+                      label: 'Deficit proyectado',
+                      value: '${deficit.toStringAsFixed(2)} %',
+                      detail: 'Porcentaje del PIB',
                     ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(_explanation(impulse)),
-              ],
-            ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(_explanation(impulse)),
+            ],
           ),
-          const SizedBox(height: 16),
-          FilledButton.icon(
-            onPressed: _apply,
-            icon: const Icon(Icons.check),
-            label: const Text('Aplicar politica fiscal'),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppPalette.primary,
-              minimumSize: const Size.fromHeight(48),
-            ),
-          ),
-          const SizedBox(height: 16),
-          const EducationalNotice(),
-        ],
-      ),
+        ),
+        const SizedBox(height: 16),
+        FilledButton.icon(
+          onPressed: _apply,
+          icon: const Icon(Icons.check),
+          label: const Text('Aplicar politica fiscal'),
+        ),
+        const SizedBox(height: 16),
+        const EducationalNotice(),
+      ],
     );
   }
 

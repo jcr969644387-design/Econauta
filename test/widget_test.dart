@@ -1,7 +1,14 @@
 import 'package:econauta/app.dart';
 import 'package:econauta/services/app_state.dart';
+import 'package:econauta/services/feedback_service.dart';
+import 'package:econauta/services/settings_controller.dart';
+import 'package:econauta/services/sound_player.dart';
 import 'package:econauta/widgets/module_button.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// Reproductor que anota los sonidos pedidos durante cada prueba.
+late RecordingSoundPlayer sounds;
 
 /// Busca el titulo de un modulo dentro de su [ModuleButton].
 ///
@@ -15,8 +22,11 @@ Finder moduleTitled(String title) {
 }
 
 void main() {
-  setUp(() {
+  setUp(() async {
     appState.reset();
+    await settingsController.restoreDefaults();
+    sounds = RecordingSoundPlayer();
+    feedback = FeedbackService(settings: settingsController, player: sounds);
   });
 
   testWidgets('la pantalla principal carga y muestra el nombre Econauta', (
@@ -47,6 +57,86 @@ void main() {
     expect(moduleTitled('Analista economico'), findsOneWidget);
   });
 
+  testWidgets('el contenido respeta el area segura del telefono', (
+    WidgetTester tester,
+  ) async {
+    // Se simula un telefono con notch arriba y barra de gestos abajo.
+    tester.view.viewPadding = const FakeViewPadding(top: 141, bottom: 105);
+    tester.view.padding = const FakeViewPadding(top: 141, bottom: 105);
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const EconautaApp());
+    await tester.pumpAndSettle();
+
+    final viewPadding = tester.view.viewPadding;
+    final ratio = tester.view.devicePixelRatio;
+    final bottomInset = viewPadding.bottom / ratio;
+    final topInset = viewPadding.top / ratio;
+
+    // El encabezado arranca por debajo del notch.
+    final header = tester.getTopLeft(
+      find.text('Simulador de politica economica'),
+    );
+    expect(header.dy, greaterThan(topInset));
+
+    // La lista reserva al menos el alto de la barra de gestos al final.
+    final listView = tester.widget<ListView>(find.byType(ListView).first);
+    final padding = listView.padding as EdgeInsets?;
+    expect(padding, isNotNull);
+    expect(padding!.bottom, greaterThanOrEqualTo(bottomInset));
+  });
+
+  testWidgets('el engranaje abre la pantalla de Configuracion', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const EconautaApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.settings_outlined));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Configuracion'), findsOneWidget);
+    expect(find.text('Sonidos'), findsOneWidget);
+    expect(find.text('Vibracion'), findsOneWidget);
+    expect(find.text('V1.0.2'), findsOneWidget);
+  });
+
+  testWidgets('desactivar el sonido silencia la aplicacion', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const EconautaApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.settings_outlined));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Sonidos'));
+    await tester.pumpAndSettle();
+    expect(settingsController.soundEnabled, isFalse);
+
+    sounds.played.clear();
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.tap(moduleTitled('Evaluacion'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Revisar respuestas'), findsOneWidget);
+    expect(sounds.played, isEmpty);
+  });
+
+  testWidgets('pulsar un modulo suena y abre la pantalla', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const EconautaApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(moduleTitled('Evaluacion'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Revisar respuestas'), findsOneWidget);
+    expect(sounds.played, contains(FeedbackService.assetFor(AppSound.tap)));
+  });
+
   testWidgets('el modulo de simulacion se abre y ejecuta periodos', (
     WidgetTester tester,
   ) async {
@@ -66,5 +156,9 @@ void main() {
 
     expect(appState.current.period, 3);
     expect(appState.history.length, 4);
+    expect(
+      sounds.played,
+      contains(FeedbackService.assetFor(AppSound.complete)),
+    );
   });
 }

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../models/economy_state.dart';
 import '../services/app_state.dart';
+import '../services/feedback_service.dart';
 import '../services/history_utils.dart';
 import '../services/simulation_engine.dart';
-import '../widgets/app_palette.dart';
+import '../widgets/app_theme.dart';
 import '../widgets/educational_notice.dart';
+import '../widgets/screen_scaffold.dart';
 import '../widgets/simple_bar_chart.dart';
 
 /// Modulo 6: ejecucion de 1 a 5 periodos y comparacion de resultados.
@@ -19,8 +21,14 @@ class SimulationScreen extends StatefulWidget {
 class _SimulationScreenState extends State<SimulationScreen> {
   int _periods = 3;
 
+  void _reset() {
+    feedback.confirm();
+    appState.reset();
+  }
+
   void _run() {
     appState.runSimulation(_periods);
+    feedback.complete();
     final message = 'Se simularon $_periods periodos.';
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
@@ -33,67 +41,56 @@ class _SimulationScreenState extends State<SimulationScreen> {
       animation: appState,
       builder: (BuildContext context, Widget? child) {
         final history = appState.history;
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Simulacion'),
-            backgroundColor: AppPalette.primary,
-            foregroundColor: Colors.white,
-            actions: <Widget>[
-              IconButton(
-                tooltip: 'Reiniciar economia',
-                onPressed: appState.reset,
-                icon: const Icon(Icons.restart_alt),
+        return ScreenScaffold(
+          title: 'Simulacion',
+          actions: <Widget>[
+            IconButton(
+              tooltip: 'Reiniciar economia',
+              onPressed: _reset,
+              icon: const Icon(Icons.restart_alt),
+            ),
+          ],
+          children: <Widget>[
+            SectionCard(
+              title: 'Periodos a simular',
+              subtitle: 'Entre 1 y ${SimulationEngine.maxPeriods} periodos',
+              child: Column(
+                children: <Widget>[
+                  _PeriodSelector(
+                    value: _periods,
+                    onChanged: (int value) {
+                      setState(() {
+                        _periods = value;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: _run,
+                    icon: const Icon(Icons.play_arrow),
+                    label: const Text('Ejecutar simulacion'),
+                  ),
+                ],
               ),
-            ],
-          ),
-          body: ListView(
-            padding: const EdgeInsets.all(16),
-            children: <Widget>[
-              SectionCard(
-                title: 'Periodos a simular',
-                subtitle: 'Entre 1 y ${SimulationEngine.maxPeriods} periodos',
-                child: Column(
-                  children: <Widget>[
-                    _PeriodSelector(
-                      value: _periods,
-                      onChanged: (int value) {
-                        setState(() {
-                          _periods = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    FilledButton.icon(
-                      onPressed: _run,
-                      icon: const Icon(Icons.play_arrow),
-                      label: const Text('Ejecutar simulacion'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppPalette.primary,
-                        minimumSize: const Size.fromHeight(48),
-                      ),
-                    ),
-                  ],
-                ),
+            ),
+            const SizedBox(height: 16),
+            SectionCard(
+              title: 'Comparacion de resultados',
+              subtitle: 'Ultimos periodos registrados',
+              child: _ResultsTable(history: HistoryUtils.last(history, 6)),
+            ),
+            const SizedBox(height: 16),
+            SectionCard(
+              title: 'Indice de estabilidad',
+              subtitle: 'Indicador educativo entre 0 y 100',
+              child: SimpleBarChart(
+                entries: _stabilityEntries(history),
+                decimals: 0,
               ),
-              const SizedBox(height: 16),
-              SectionCard(
-                title: 'Comparacion de resultados',
-                subtitle: 'Ultimos periodos registrados',
-                child: _ResultsTable(history: HistoryUtils.last(history, 6)),
-              ),
-              const SizedBox(height: 16),
-              SectionCard(
-                title: 'Indice de estabilidad',
-                subtitle: 'Indicador educativo entre 0 y 100',
-                child: SimpleBarChart(
-                  entries: _stabilityEntries(history),
-                  decimals: 0,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const EducationalNotice(),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+            const EducationalNotice(),
+          ],
         );
       },
     );
@@ -118,6 +115,7 @@ class _PeriodSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
     final options = <int>[1, 2, 3, 4, 5];
     return Wrap(
       spacing: 8,
@@ -125,13 +123,14 @@ class _PeriodSelector extends StatelessWidget {
         return ChoiceChip(
           label: Text('$option'),
           selected: option == value,
-          selectedColor: AppPalette.primary,
+          selectedColor: colors.accent,
           labelStyle: TextStyle(
-            color: option == value ? Colors.white : AppPalette.neutral,
+            color: option == value ? colors.cardSurface : colors.muted,
             fontWeight: FontWeight.w600,
           ),
           onSelected: (bool selected) {
             if (selected) {
+              feedback.tap();
               onChanged(option);
             }
           },

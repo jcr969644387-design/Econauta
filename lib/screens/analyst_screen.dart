@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import '../models/analyst_insight.dart';
 import '../services/app_state.dart';
 import '../services/economic_analyst.dart';
-import '../widgets/app_palette.dart';
+import '../widgets/app_theme.dart';
 import '../widgets/educational_notice.dart';
+import '../widgets/screen_scaffold.dart';
 
 /// Modulo 8: analista economico local basado en reglas.
 class AnalystScreen extends StatelessWidget {
@@ -17,43 +18,36 @@ class AnalystScreen extends StatelessWidget {
       builder: (BuildContext context, Widget? child) {
         final insights = appState.insights;
         final state = appState.current;
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Analista economico'),
-            backgroundColor: AppPalette.primary,
-            foregroundColor: Colors.white,
-          ),
-          body: ListView(
-            padding: const EdgeInsets.all(16),
-            children: <Widget>[
+        return ScreenScaffold(
+          title: 'Analista economico',
+          children: <Widget>[
+            SectionCard(
+              title: 'Lectura general',
+              subtitle: 'Periodo ${state.period}',
+              child: Text(EconomicAnalyst.summary(state)),
+            ),
+            const SizedBox(height: 16),
+            if (insights.isEmpty)
               SectionCard(
-                title: 'Lectura general',
-                subtitle: 'Periodo ${state.period}',
-                child: Text(EconomicAnalyst.summary(state)),
-              ),
-              const SizedBox(height: 16),
-              if (insights.isEmpty)
-                SectionCard(
-                  title: 'Sin analisis disponible',
-                  child: const Text(
-                    'Ejecuta una simulacion en el modulo Simulacion para que '
-                    'el analista explique por que cambiaron los indicadores.',
-                  ),
+                title: 'Sin analisis disponible',
+                child: const Text(
+                  'Ejecuta una simulacion en el modulo Simulacion para que '
+                  'el analista explique por que cambiaron los indicadores.',
                 ),
-              ...insights.map((AnalystInsight insight) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: _InsightCard(insight: insight),
-                );
-              }),
-              const SizedBox(height: 4),
-              const EducationalNotice(
-                message: 'El analista funciona sin Internet y sin servicios '
-                    'externos: aplica reglas educativas transparentes sobre '
-                    'los resultados de la simulacion.',
               ),
-            ],
-          ),
+            ...insights.map((AnalystInsight insight) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _InsightCard(insight: insight),
+              );
+            }),
+            const SizedBox(height: 4),
+            const EducationalNotice(
+              message: 'El analista funciona sin Internet y sin servicios '
+                  'externos: aplica reglas educativas transparentes sobre '
+                  'los resultados de la simulacion.',
+            ),
+          ],
         );
       },
     );
@@ -68,20 +62,21 @@ class _InsightCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    var color = AppPalette.neutral;
+    final colors = AppColors.of(context);
+    var color = colors.muted;
     var icon = Icons.info_outline;
     if (insight.tone == InsightTone.positive) {
-      color = AppPalette.positive;
+      color = colors.positive;
       icon = Icons.trending_up;
     } else if (insight.tone == InsightTone.negative) {
-      color = AppPalette.negative;
+      color = colors.negative;
       icon = Icons.trending_down;
     }
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppPalette.border),
+        color: colors.cardSurface,
+        border: Border.all(color: colors.border),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(

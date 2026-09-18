@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'app_palette.dart';
+import '../services/feedback_service.dart';
+import 'app_theme.dart';
 
 /// Control deslizante usado para modificar un parametro de politica.
 class PolicySlider extends StatelessWidget {
@@ -39,6 +40,7 @@ class PolicySlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colors = AppColors.of(context);
     final helperText = helper;
     final divisions = ((max - min) * 2).round();
     return Column(
@@ -51,7 +53,7 @@ class PolicySlider extends StatelessWidget {
             Text(
               '${value.toStringAsFixed(1)}$suffix',
               style: theme.textTheme.titleSmall?.copyWith(
-                color: AppPalette.primary,
+                color: colors.accent,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -63,17 +65,21 @@ class PolicySlider extends StatelessWidget {
           max: max,
           divisions: divisions > 0 ? divisions : null,
           label: value.toStringAsFixed(1),
-          activeColor: AppPalette.primary,
-          onChanged: onChanged,
+          activeColor: colors.accent,
+          onChanged: _handleChanged,
         ),
         if (helperText != null)
           Text(
             helperText,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: AppPalette.neutral,
-            ),
+            style: theme.textTheme.bodySmall?.copyWith(color: colors.muted),
           ),
       ],
     );
+  }
+
+  void _handleChanged(double next) {
+    // Vibracion muy corta en cada paso, como en los controles del sistema.
+    feedback.vibrate(AppHaptic.light);
+    onChanged(next);
   }
 }

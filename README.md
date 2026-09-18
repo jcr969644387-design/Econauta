@@ -60,9 +60,10 @@ inflación y el empleo a lo largo del tiempo.
 - Material 3, interfaz en español.
 - Aplicación Android, diseño adaptable para teléfonos.
 - Funcionamiento local, sin conexión, sin API externa y sin claves secretas.
-- Sin dependencias de terceros: solo el SDK de Flutter y `flutter_lints`.
-- Arquitectura simple por capas: `models`, `calculators`, `services`,
-  `screens`, `widgets`.
+- Dependencias minimas: `audioplayers` para los efectos de sonido y
+  `shared_preferences` para guardar las preferencias.
+- Arquitectura simple por capas: `models`, `calculators`, `repositories`,
+  `services`, `screens`, `widgets`.
 
 ## Estructura del proyecto
 
@@ -70,11 +71,13 @@ inflación y el empleo a lo largo del tiempo.
 lib/
   main.dart
   app.dart
-  models/        # Estado económico, políticas, preguntas, constantes
+  models/        # Estado económico, políticas, preguntas, preferencias
   calculators/   # Reglas puras: inflación, PIB, empleo, fiscal, monetaria
-  screens/       # Una pantalla por módulo
-  widgets/       # Tarjetas, gráficos, controles reutilizables
-  services/      # Motor de simulación, analista local, estado de la app
+  repositories/  # Persistencia de las preferencias (Repository Pattern)
+  screens/       # Una pantalla por módulo, más Configuración
+  widgets/       # Tarjetas, gráficos, tema claro/oscuro, área segura
+  services/      # Simulación, analista local, estado, sonido y vibración
+assets/audio/    # Efectos de sonido cortos en formato WAV
 test/            # Pruebas unitarias y de widget
 docs/            # Guía de uso, indicadores, supuestos y limitaciones
 ```

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
-import 'app_palette.dart';
+import '../services/feedback_service.dart';
+import 'app_theme.dart';
 
 /// Boton con forma de tarjeta que abre un modulo educativo.
-class ModuleButton extends StatelessWidget {
+///
+/// Al pulsarlo se encoge levemente y emite sonido y vibracion, de modo que
+/// la respuesta al toque se sienta inmediata.
+class ModuleButton extends StatefulWidget {
   const ModuleButton({
     super.key,
     required this.title,
@@ -25,44 +29,79 @@ class ModuleButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   @override
+  State<ModuleButton> createState() => _ModuleButtonState();
+}
+
+class _ModuleButtonState extends State<ModuleButton> {
+  bool _pressed = false;
+
+  void _setPressed(bool value) {
+    if (_pressed == value) {
+      return;
+    }
+    setState(() {
+      _pressed = value;
+    });
+  }
+
+  void _handlePressed() {
+    feedback.tap();
+    widget.onPressed();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return OutlinedButton(
-      onPressed: onPressed,
-      style: OutlinedButton.styleFrom(
-        alignment: Alignment.topLeft,
-        padding: const EdgeInsets.all(14),
-        foregroundColor: AppPalette.primaryDark,
-        side: const BorderSide(color: AppPalette.border),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+    final colors = AppColors.of(context);
+    return Listener(
+      // Listener no compite en la arena de gestos, asi que el efecto de
+      // pulsado funciona sin interferir con el toque del boton.
+      onPointerDown: (_) => _setPressed(true),
+      onPointerUp: (_) => _setPressed(false),
+      onPointerCancel: (_) => _setPressed(false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.97 : 1,
+        duration: const Duration(milliseconds: 130),
+        curve: Curves.easeOut,
+        child: OutlinedButton(
+          onPressed: _handlePressed,
+          style: OutlinedButton.styleFrom(
+            alignment: Alignment.topLeft,
+            padding: const EdgeInsets.all(14),
+            foregroundColor: colors.heading,
+            backgroundColor: colors.cardSurface,
+            side: BorderSide(color: colors.border),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(widget.icon, color: colors.accent),
+              const SizedBox(height: 10),
+              Text(
+                widget.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: colors.heading,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                widget.description,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colors.muted,
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Icon(icon, color: AppPalette.primary),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: AppPalette.primaryDark,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            description,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: AppPalette.neutral,
-            ),
-          ),
-        ],
       ),
     );
   }

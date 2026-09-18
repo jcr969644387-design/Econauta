@@ -34,7 +34,23 @@ jobs:
         run: flutter pub get
 
       - name: Verificar formato
-        run: dart format --output=none --set-exit-if-changed .
+        run: |
+          if dart format --output=none --set-exit-if-changed . ; then
+            exit 0
+          fi
+          dart format . > /dev/null
+          git --no-pager diff > format.diff
+          {
+            echo '### dart format aplicaria estos cambios'
+            echo '```diff'
+            head -n 300 format.diff
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          msg=$(head -n 120 format.diff \
+            | sed -e 's/%/%25/g' -e 's/\r//g' \
+            | awk '{printf "%s%%0A", $0}')
+          echo "::error::${msg}"
+          exit 1
 
       - name: Analizar codigo
         run: flutter analyze

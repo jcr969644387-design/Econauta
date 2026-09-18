@@ -5,8 +5,10 @@ import '../models/economy_state.dart';
 import '../services/app_state.dart';
 import '../services/history_utils.dart';
 import '../widgets/app_palette.dart';
+import '../widgets/app_theme.dart';
 import '../widgets/educational_notice.dart';
 import '../widgets/indicator_card.dart';
+import '../widgets/screen_scaffold.dart';
 import '../widgets/simple_bar_chart.dart';
 
 /// Modulo 2: PIB, crecimiento y componentes del gasto.
@@ -19,46 +21,39 @@ class GdpScreen extends StatelessWidget {
       animation: appState,
       builder: (BuildContext context, Widget? child) {
         final state = appState.current;
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('PIB y crecimiento'),
-            backgroundColor: AppPalette.primary,
-            foregroundColor: Colors.white,
-          ),
-          body: ListView(
-            padding: const EdgeInsets.all(16),
-            children: <Widget>[
-              SectionCard(
-                title: 'Produccion del periodo ${state.period}',
-                subtitle: GdpCalculator.classify(state.gdpGrowth),
-                child: _GdpIndicators(state: state),
+        return ScreenScaffold(
+          title: 'PIB y crecimiento',
+          children: <Widget>[
+            SectionCard(
+              title: 'Produccion del periodo ${state.period}',
+              subtitle: GdpCalculator.classify(state.gdpGrowth),
+              child: _GdpIndicators(state: state),
+            ),
+            const SizedBox(height: 16),
+            SectionCard(
+              title: 'Componentes del gasto',
+              subtitle: 'Consumo, inversion y gasto publico',
+              child: SimpleBarChart(
+                entries: _componentEntries(state),
               ),
-              const SizedBox(height: 16),
-              SectionCard(
-                title: 'Componentes del gasto',
-                subtitle: 'Consumo, inversion y gasto publico',
-                child: SimpleBarChart(
-                  entries: _componentEntries(state),
-                ),
+            ),
+            const SizedBox(height: 16),
+            SectionCard(
+              title: 'Evolucion del crecimiento',
+              subtitle: 'Ultimos periodos simulados',
+              child: SimpleBarChart(
+                entries: _growthEntries(appState.history),
+                suffix: ' %',
               ),
-              const SizedBox(height: 16),
-              SectionCard(
-                title: 'Evolucion del crecimiento',
-                subtitle: 'Ultimos periodos simulados',
-                child: SimpleBarChart(
-                  entries: _growthEntries(appState.history),
-                  suffix: ' %',
-                ),
-              ),
-              const SizedBox(height: 16),
-              SectionCard(
-                title: 'Explicacion educativa',
-                child: Text(_explanation(state)),
-              ),
-              const SizedBox(height: 16),
-              const EducationalNotice(),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+            SectionCard(
+              title: 'Explicacion educativa',
+              child: Text(_explanation(state)),
+            ),
+            const SizedBox(height: 16),
+            const EducationalNotice(),
+          ],
         );
       },
     );
@@ -107,8 +102,9 @@ class _GdpIndicators extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
     final growth = state.gdpGrowth;
-    final color = growth >= 0 ? AppPalette.positive : AppPalette.negative;
+    final color = growth >= 0 ? colors.positive : colors.negative;
     return Column(
       children: <Widget>[
         Row(

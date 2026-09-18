@@ -4,9 +4,10 @@ import '../calculators/labor_calculator.dart';
 import '../models/economy_state.dart';
 import '../services/app_state.dart';
 import '../services/history_utils.dart';
-import '../widgets/app_palette.dart';
+import '../widgets/app_theme.dart';
 import '../widgets/educational_notice.dart';
 import '../widgets/indicator_card.dart';
+import '../widgets/screen_scaffold.dart';
 import '../widgets/simple_bar_chart.dart';
 
 /// Modulo 3: empleo, desempleo y variacion del mercado laboral.
@@ -20,38 +21,31 @@ class LaborScreen extends StatelessWidget {
       builder: (BuildContext context, Widget? child) {
         final state = appState.current;
         final previous = appState.previous;
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Mercado laboral'),
-            backgroundColor: AppPalette.primary,
-            foregroundColor: Colors.white,
-          ),
-          body: ListView(
-            padding: const EdgeInsets.all(16),
-            children: <Widget>[
-              SectionCard(
-                title: 'Situacion del empleo',
-                subtitle: LaborCalculator.classify(state.unemployment),
-                child: _LaborIndicators(state: state, previous: previous),
+        return ScreenScaffold(
+          title: 'Mercado laboral',
+          children: <Widget>[
+            SectionCard(
+              title: 'Situacion del empleo',
+              subtitle: LaborCalculator.classify(state.unemployment),
+              child: _LaborIndicators(state: state, previous: previous),
+            ),
+            const SizedBox(height: 16),
+            SectionCard(
+              title: 'Evolucion del desempleo',
+              subtitle: 'Ultimos periodos simulados',
+              child: SimpleBarChart(
+                entries: _entries(appState.history),
+                suffix: ' %',
               ),
-              const SizedBox(height: 16),
-              SectionCard(
-                title: 'Evolucion del desempleo',
-                subtitle: 'Ultimos periodos simulados',
-                child: SimpleBarChart(
-                  entries: _entries(appState.history),
-                  suffix: ' %',
-                ),
-              ),
-              const SizedBox(height: 16),
-              SectionCard(
-                title: 'Explicacion educativa',
-                child: Text(_explanation(state)),
-              ),
-              const SizedBox(height: 16),
-              const EducationalNotice(),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+            SectionCard(
+              title: 'Explicacion educativa',
+              child: Text(_explanation(state)),
+            ),
+            const SizedBox(height: 16),
+            const EducationalNotice(),
+          ],
         );
       },
     );
@@ -93,15 +87,16 @@ class _LaborIndicators extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
     final before = previous;
     final slack = LaborCalculator.slack(state.unemployment);
     final slackText = '${slack.toStringAsFixed(2)} pts';
     var variation = 'Sin periodos previos';
-    var color = AppPalette.primaryDark;
+    var color = colors.heading;
     if (before != null) {
       final change = state.unemployment - before.unemployment;
       variation = 'Variacion: ${change.toStringAsFixed(2)} puntos';
-      color = change <= 0 ? AppPalette.positive : AppPalette.negative;
+      color = change <= 0 ? colors.positive : colors.negative;
     }
     return Column(
       children: <Widget>[

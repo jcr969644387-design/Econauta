@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'app_palette.dart';
+import 'app_theme.dart';
 
 /// Tarjeta compacta que muestra un indicador economico.
 class IndicatorCard extends StatelessWidget {
@@ -27,12 +27,15 @@ class IndicatorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colors = AppColors.of(context);
     final detailText = detail;
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 240),
+      curve: Curves.easeOut,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppPalette.surfaceSoft,
-        border: Border.all(color: AppPalette.border),
+        color: colors.softSurface,
+        border: Border.all(color: colors.border),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -41,25 +44,26 @@ class IndicatorCard extends StatelessWidget {
         children: <Widget>[
           Text(
             label,
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: AppPalette.neutral,
-            ),
+            style: theme.textTheme.labelMedium?.copyWith(color: colors.muted),
           ),
           const SizedBox(height: 4),
-          Text(
-            value,
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: valueColor ?? AppPalette.primaryDark,
-              fontWeight: FontWeight.w700,
+          // El valor se desvanece al cambiar para que se note la simulacion.
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 280),
+            child: Text(
+              value,
+              key: ValueKey<String>(value),
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: valueColor ?? colors.heading,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
           if (detailText != null) const SizedBox(height: 2),
           if (detailText != null)
             Text(
               detailText,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: AppPalette.neutral,
-              ),
+              style: theme.textTheme.bodySmall?.copyWith(color: colors.muted),
             ),
         ],
       ),
