@@ -129,18 +129,24 @@ void main() {
     expect(sounds.played, isEmpty);
   });
 
-  testWidgets('pulsar un modulo suena y abre la pantalla', (
+  testWidgets('los controles principales suenan al pulsarlos', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const EconautaApp());
     await tester.pumpAndSettle();
 
-    await tester.ensureVisible(moduleTitled('Evaluacion'));
+    await tester.tap(find.byIcon(Icons.restart_alt));
     await tester.pumpAndSettle();
-    await tester.tap(moduleTitled('Evaluacion'));
+    expect(
+      sounds.played,
+      contains(FeedbackService.assetFor(AppSound.confirm)),
+    );
+
+    sounds.played.clear();
+    await tester.tap(find.byIcon(Icons.settings_outlined));
     await tester.pumpAndSettle();
 
-    expect(find.text('Progreso'), findsOneWidget);
+    expect(find.text('Configuracion'), findsOneWidget);
     expect(sounds.played, contains(FeedbackService.assetFor(AppSound.tap)));
   });
 
@@ -157,6 +163,8 @@ void main() {
 
     expect(find.text('Periodos a simular'), findsOneWidget);
     expect(find.text('Ejecutar simulacion'), findsOneWidget);
+    // Abrir el modulo desde la tarjeta emite el sonido de pulsacion.
+    expect(sounds.played, contains(FeedbackService.assetFor(AppSound.tap)));
 
     await tester.tap(find.text('Ejecutar simulacion'));
     await tester.pumpAndSettle();
