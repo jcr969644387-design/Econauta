@@ -62,13 +62,16 @@ jobs:
           {
             echo '### Resultado de flutter test'
             echo '```text'
-            tail -n 200 test-output.txt
+            tail -n 250 test-output.txt
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           if [ "$status" -ne 0 ]; then
-            msg=$(tail -n 80 test-output.txt \
-              | sed -e 's/%/%25/g' -e 's/\r//g' \
-              | awk '{printf "%s%%0A", $0}')
-            echo "::error::${msg}"
+            for part in 3 2 1; do
+              msg=$(tail -n $((part * 70)) test-output.txt \
+                | head -n 70 \
+                | sed -e 's/%/%25/g' -e 's/\r//g' \
+                | awk '{printf "%s%%0A", $0}')
+              echo "::error::${msg}"
+            done
           fi
           exit "$status"

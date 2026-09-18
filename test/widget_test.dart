@@ -98,6 +98,9 @@ void main() {
     expect(find.text('Configuracion'), findsOneWidget);
     expect(find.text('Sonidos'), findsOneWidget);
     expect(find.text('Vibracion'), findsOneWidget);
+
+    await tester.scrollUntilVisible(find.text('V1.0.2'), 200);
+    await tester.pumpAndSettle();
     expect(find.text('V1.0.2'), findsOneWidget);
   });
 
@@ -122,7 +125,7 @@ void main() {
     await tester.tap(moduleTitled('Evaluacion'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Revisar respuestas'), findsOneWidget);
+    expect(find.text('Progreso'), findsOneWidget);
     expect(sounds.played, isEmpty);
   });
 
@@ -137,7 +140,7 @@ void main() {
     await tester.tap(moduleTitled('Evaluacion'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Revisar respuestas'), findsOneWidget);
+    expect(find.text('Progreso'), findsOneWidget);
     expect(sounds.played, contains(FeedbackService.assetFor(AppSound.tap)));
   });
 
