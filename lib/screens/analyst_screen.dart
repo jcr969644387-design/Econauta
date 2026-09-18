@@ -61,7 +61,7 @@ class AnalystScreen extends StatelessWidget {
 }
 
 class _InsightCard extends StatelessWidget {
-  const _InsightCard({super.key, required this.insight});
+  const _InsightCard({required this.insight});
 
   final AnalystInsight insight;
 

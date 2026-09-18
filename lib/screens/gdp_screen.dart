@@ -101,7 +101,7 @@ class GdpScreen extends StatelessWidget {
 }
 
 class _GdpIndicators extends StatelessWidget {
-  const _GdpIndicators({super.key, required this.state});
+  const _GdpIndicators({required this.state});
 
   final EconomyState state;
 

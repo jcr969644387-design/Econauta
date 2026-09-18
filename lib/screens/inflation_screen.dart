@@ -95,7 +95,6 @@ class InflationScreen extends StatelessWidget {
 
 class _InflationIndicators extends StatelessWidget {
   const _InflationIndicators({
-    super.key,
     required this.state,
     required this.previous,
   });

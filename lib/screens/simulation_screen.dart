@@ -109,7 +109,6 @@ class _SimulationScreenState extends State<SimulationScreen> {
 
 class _PeriodSelector extends StatelessWidget {
   const _PeriodSelector({
-    super.key,
     required this.value,
     required this.onChanged,
   });
@@ -143,7 +142,7 @@ class _PeriodSelector extends StatelessWidget {
 }
 
 class _ResultsTable extends StatelessWidget {
-  const _ResultsTable({super.key, required this.history});
+  const _ResultsTable({required this.history});
 
   final List<EconomyState> history;
 

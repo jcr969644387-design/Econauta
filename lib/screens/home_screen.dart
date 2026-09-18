@@ -71,7 +71,7 @@ class HomeScreen extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({super.key, required this.state});
+  const _Header({required this.state});
 
   final EconomyState state;
 
@@ -110,7 +110,7 @@ class _Header extends StatelessWidget {
 }
 
 class _IndicatorGrid extends StatelessWidget {
-  const _IndicatorGrid({super.key, required this.state});
+  const _IndicatorGrid({required this.state});
 
   final EconomyState state;
 
@@ -166,7 +166,7 @@ class _IndicatorGrid extends StatelessWidget {
 }
 
 class _ModuleGrid extends StatelessWidget {
-  const _ModuleGrid({super.key});
+  const _ModuleGrid();
 
   @override
   Widget build(BuildContext context) {

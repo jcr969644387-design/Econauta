@@ -84,7 +84,6 @@ class LaborScreen extends StatelessWidget {
 
 class _LaborIndicators extends StatelessWidget {
   const _LaborIndicators({
-    super.key,
     required this.state,
     required this.previous,
   });

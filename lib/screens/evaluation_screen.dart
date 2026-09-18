@@ -110,7 +110,6 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
 
 class _ScoreBanner extends StatelessWidget {
   const _ScoreBanner({
-    super.key,
     required this.submitted,
     required this.score,
     required this.total,
@@ -156,7 +155,6 @@ class _ScoreBanner extends StatelessWidget {
 
 class _QuestionCard extends StatelessWidget {
   const _QuestionCard({
-    super.key,
     required this.question,
     required this.selected,
     required this.submitted,
@@ -229,7 +227,6 @@ class _QuestionCard extends StatelessWidget {
 
 class _OptionTile extends StatelessWidget {
   const _OptionTile({
-    super.key,
     required this.text,
     required this.isSelected,
     required this.onTap,
