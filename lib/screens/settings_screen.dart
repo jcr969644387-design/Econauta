@@ -26,29 +26,34 @@ class SettingsScreen extends StatelessWidget {
             SectionCard(
               title: 'Experiencia',
               subtitle: 'Sonido y vibracion durante la practica',
-              child: Column(
-                children: <Widget>[
-                  SwitchListTile.adaptive(
-                    value: settingsController.soundEnabled,
-                    onChanged: _setSound,
-                    title: const Text('Sonidos'),
-                    subtitle: const Text(
-                      'Efectos cortos al pulsar y al completar actividades',
+              // ListTile pinta su tinta sobre el Material mas cercano: sin
+              // este envoltorio quedaria oculta por el fondo de la tarjeta.
+              child: Material(
+                type: MaterialType.transparency,
+                child: Column(
+                  children: <Widget>[
+                    SwitchListTile.adaptive(
+                      value: settingsController.soundEnabled,
+                      onChanged: _setSound,
+                      title: const Text('Sonidos'),
+                      subtitle: const Text(
+                        'Efectos cortos al pulsar y al completar actividades',
+                      ),
+                      secondary: const Icon(Icons.volume_up_outlined),
+                      contentPadding: EdgeInsets.zero,
                     ),
-                    secondary: const Icon(Icons.volume_up_outlined),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  SwitchListTile.adaptive(
-                    value: settingsController.hapticsEnabled,
-                    onChanged: _setHaptics,
-                    title: const Text('Vibracion'),
-                    subtitle: const Text(
-                      'Respuesta tactil al pulsar, acertar o fallar',
+                    SwitchListTile.adaptive(
+                      value: settingsController.hapticsEnabled,
+                      onChanged: _setHaptics,
+                      title: const Text('Vibracion'),
+                      subtitle: const Text(
+                        'Respuesta tactil al pulsar, acertar o fallar',
+                      ),
+                      secondary: const Icon(Icons.vibration),
+                      contentPadding: EdgeInsets.zero,
                     ),
-                    secondary: const Icon(Icons.vibration),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 16),
