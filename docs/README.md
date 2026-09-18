@@ -22,6 +22,9 @@ indicadores y qué supuestos utiliza el modelo.
    retroalimentación y explicación.
 7. **Reinicia cuando quieras.** El botón de reinicio devuelve la economía al
    estado inicial para probar una estrategia distinta.
+8. **Ajusta la experiencia.** El engranaje de la pantalla principal abre
+   *Configuración*, donde puedes activar o desactivar los sonidos y la
+   vibración, y elegir tema claro, oscuro o el del sistema.
 
 ### Ejercicio sugerido
 
@@ -43,6 +46,7 @@ tu resultado con el de un compañero y discutan los costos de cada estrategia.
 | Simulación | Ejecución de 1 a 5 periodos y tabla comparativa |
 | Evaluación | Diez preguntas de opción múltiple con explicación |
 | Analista económico | Comentarios generados por reglas locales |
+| Configuración | Sonido, vibración, tema e información del proyecto |
 
 ---
 

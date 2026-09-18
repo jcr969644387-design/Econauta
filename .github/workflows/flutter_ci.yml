@@ -66,14 +66,15 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           if [ "$status" -ne 0 ]; then
+            failing=$(grep -F '[E]' test-output.txt \
+              | sed -e 's/%/%25/g' -e 's/\r//g' \
+              | awk '{printf "%s%%0A", $0}')
+            echo "::error::PRUEBAS FALLIDAS%0A${failing}"
             # Se descartan las lineas de progreso para dejar solo los errores.
-            grep -v -E '^[0-9]{2}:[0-9]{2} \+[0-9]+ ' test-output.txt \
-              > test-errors.txt || true
-            for chunk in head tail; do
-              msg=$("$chunk" -n 55 test-errors.txt \
-                | sed -e 's/%/%25/g' -e 's/\r//g' \
-                | awk '{printf "%s%%0A", $0}')
-              echo "::error::${msg}"
-            done
+            detalle=$(grep -v -E '^[0-9]{2}:[0-9]{2} \+[0-9]+' test-output.txt \
+              | tail -n 55 \
+              | sed -e 's/%/%25/g' -e 's/\r//g' \
+              | awk '{printf "%s%%0A", $0}')
+            echo "::error::${detalle}"
           fi
           exit "$status"
