@@ -39,7 +39,7 @@ jobs:
             exit 0
           fi
           dart format . > /dev/null
-          git --no-pager diff > format.diff
+          git --no-pager diff -- '*.dart' > format.diff
           {
             echo '### dart format aplicaria estos cambios'
             echo '```diff'

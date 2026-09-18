@@ -9,7 +9,7 @@ import '../repositories/settings_repository.dart';
 class SettingsController extends ChangeNotifier {
   /// Crea el controlador con el repositorio indicado.
   SettingsController({SettingsRepository? repository})
-    : _repository = repository ?? PreferencesSettingsRepository();
+      : _repository = repository ?? PreferencesSettingsRepository();
 
   final SettingsRepository _repository;
 
