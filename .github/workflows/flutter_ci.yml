@@ -49,4 +49,9 @@ jobs:
             tail -n 200 test-output.txt
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$status" -ne 0 ]; then
+            tail -n 45 test-output.txt | while IFS= read -r line; do
+              echo "::error::${line}"
+            done
+          fi
           exit "$status"
