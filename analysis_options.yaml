@@ -1,0 +1,15 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  errors:
+    todo: ignore
+
+linter:
+  rules:
+    # Se desactivan reglas de estilo opcionales para que `flutter analyze`
+    # se concentre en errores reales y no en sugerencias de const.
+    prefer_const_constructors: false
+    prefer_const_literals_to_create_immutables: false
+    prefer_const_constructors_in_immutables: false
+    prefer_const_declarations: false
+    use_key_in_widget_constructors: true
