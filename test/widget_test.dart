@@ -117,6 +117,8 @@ void main() {
     sounds.played.clear();
     await tester.pageBack();
     await tester.pumpAndSettle();
+    await tester.ensureVisible(moduleTitled('Evaluacion'));
+    await tester.pumpAndSettle();
     await tester.tap(moduleTitled('Evaluacion'));
     await tester.pumpAndSettle();
 
@@ -130,6 +132,8 @@ void main() {
     await tester.pumpWidget(const EconautaApp());
     await tester.pumpAndSettle();
 
+    await tester.ensureVisible(moduleTitled('Evaluacion'));
+    await tester.pumpAndSettle();
     await tester.tap(moduleTitled('Evaluacion'));
     await tester.pumpAndSettle();
 

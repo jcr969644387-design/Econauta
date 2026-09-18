@@ -66,8 +66,9 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           if [ "$status" -ne 0 ]; then
-            tail -n 45 test-output.txt | while IFS= read -r line; do
-              echo "::error::${line}"
-            done
+            msg=$(tail -n 80 test-output.txt \
+              | sed -e 's/%/%25/g' -e 's/\r//g' \
+              | awk '{printf "%s%%0A", $0}')
+            echo "::error::${msg}"
           fi
           exit "$status"
