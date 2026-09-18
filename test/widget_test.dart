@@ -1,4 +1,5 @@
 import 'package:econauta/app.dart';
+import 'package:econauta/repositories/settings_repository.dart';
 import 'package:econauta/services/app_state.dart';
 import 'package:econauta/services/feedback_service.dart';
 import 'package:econauta/services/settings_controller.dart';
@@ -22,9 +23,13 @@ Finder moduleTitled(String title) {
 }
 
 void main() {
-  setUp(() async {
+  setUp(() {
     appState.reset();
-    await settingsController.restoreDefaults();
+    // Un controlador en memoria evita que las pruebas toquen el
+    // almacenamiento nativo, que no existe en el entorno de pruebas.
+    settingsController = SettingsController(
+      repository: InMemorySettingsRepository(),
+    );
     sounds = RecordingSoundPlayer();
     feedback = FeedbackService(settings: settingsController, player: sounds);
   });

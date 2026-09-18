@@ -34,7 +34,9 @@ class SettingsController extends ChangeNotifier {
   /// Lee las preferencias guardadas al iniciar la aplicacion.
   Future<void> load() async {
     try {
-      _settings = await _repository.load();
+      // Un almacenamiento que no responde no debe bloquear el arranque.
+      const limit = Duration(seconds: 3);
+      _settings = await _repository.load().timeout(limit);
     } catch (error) {
       debugPrint('Econauta: preferencias no disponibles ($error)');
       _settings = AppSettings.initial;
@@ -76,4 +78,7 @@ class SettingsController extends ChangeNotifier {
 }
 
 /// Instancia global usada por las pantallas del MVP.
-final SettingsController settingsController = SettingsController();
+///
+/// Las pruebas la reemplazan por una con [InMemorySettingsRepository], para
+/// no depender del almacenamiento nativo del telefono.
+SettingsController settingsController = SettingsController();
