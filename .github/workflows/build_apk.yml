@@ -36,7 +36,22 @@ jobs:
         run: flutter test
 
       - name: Build APK release
-        run: flutter build apk --release
+        run: |
+          flutter build apk --release 2>&1 | tee build-output.txt
+          status=${PIPESTATUS[0]}
+          {
+            echo '### Resultado de flutter build apk'
+            echo '```text'
+            tail -n 250 build-output.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$status" -ne 0 ]; then
+            msg=$(tail -n 80 build-output.txt \
+              | sed -e 's/%/%25/g' -e 's/\r//g' \
+              | awk '{printf "%s%%0A", $0}')
+            echo "::error::${msg}"
+          fi
+          exit "$status"
 
       - name: Verify APK
         run: |
